@@ -37,16 +37,46 @@ class WaypointUpdater(object):
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # TODO: Add other member variables you need below
+        self.base_waypoints = None
 
         rospy.spin()
 
+
+    def next_waypoint(self, position):
+        waypoints_list = self.base_waypoints.waypoints
+        dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
+        min_dist = 0
+        nearest_waypoint = -1
+        for i in range(len(waypoints_list)):
+            waypoint_position = waypoints_list[i].pose.pose.position
+            dist = dl(position, waypoint_position)
+            if dist < min_dist:
+                min_dist = dist
+                nearest_waypoint = i
+        prev_waypoint = nearest_waypoint - 1
+        dist_prev_current_position = dl(position, waypoints_list[prev_waypoint].pose.pose.position)
+        dist_prev_nearest = dl(waypoints_list[prev_waypoint].pose.pose.position,
+                               waypoints_list[nearest_waypoint].pose.pose.position)
+        if dist_prev_current_position < dist_prev_nearest:
+            return nearest_waypoint
+        return nearest_waypoint + 1
+
     def pose_cb(self, msg):
         # TODO: Implement
-        pass
+        position = msg.pose.position
+        next_wp = self.next_waypoint(position)
+        base_waypoints_length = len(self.base_waypoints.waypoints)
+        ahead_waypoints = []
+        for i in range(LOOKAHEAD_WPS):
+            ahead_waypoints.append(self.base_waypoints.waypoints[(next_wp + i) % base_waypoints_length])
+        lane = Lane()
+        lane.waypoints = ahead_waypoints
+        self.final_waypoints_pub.publish(lane)
 
     def waypoints_cb(self, waypoints):
         # TODO: Implement
-        pass
+        # base waypoints is only published once, so it should be stored here
+        self.base_waypoints = waypoints
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement

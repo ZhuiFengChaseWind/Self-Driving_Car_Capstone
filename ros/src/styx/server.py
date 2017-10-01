@@ -28,9 +28,11 @@ bridge = Bridge(conf, send)
 
 @sio.on('telemetry')
 def telemetry(sid, data):
+    print("telemetry")
     global dbw_enable
     if data["dbw_enable"] != dbw_enable:
         dbw_enable = data["dbw_enable"]
+        print("dbw status updated")
         bridge.publish_dbw_status(dbw_enable)
     bridge.publish_odometry(data)
     for i in range(len(msgs)):
@@ -39,22 +41,27 @@ def telemetry(sid, data):
 
 @sio.on('control')
 def control(sid, data):
+    print('control')
     bridge.publish_controls(data)
 
 @sio.on('obstacle')
 def obstacle(sid, data):
+    print('obstacle')
     bridge.publish_obstacles(data)
 
 @sio.on('lidar')
 def obstacle(sid, data):
+    print('lidar')
     bridge.publish_lidar(data)
 
 @sio.on('trafficlights')
 def trafficlights(sid, data):
+    print('trafficlights')
     bridge.publish_traffic(data)
 
 @sio.on('image')
 def image(sid, data):
+    print('image')
     bridge.publish_camera(data)
 
 if __name__ == '__main__':
