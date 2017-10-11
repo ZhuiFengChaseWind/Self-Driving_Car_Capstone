@@ -9,7 +9,7 @@ import math
 from twist_controller import Controller
 from pid import *
 from yaw_controller import *
-
+from lowpass import *
 
 '''
 You can build this node only after you have built (or partially built) the `waypoint_updater` node.
@@ -54,6 +54,11 @@ class DBWNode(object):
         self.current_velocity = None
         self.twist_cmd = None
 
+        self.vehicle_mass = vehicle_mass
+        self.wheel_radius = wheel_radius
+        self.brake_deadband = brake_deadband
+        self.lowpass_filter = LowPassFilter(1, 1)
+
         self.steer_pub = rospy.Publisher('/vehicle/steering_cmd',
                                          SteeringCmd, queue_size=1)
         self.throttle_pub = rospy.Publisher('/vehicle/throttle_cmd',
@@ -62,9 +67,9 @@ class DBWNode(object):
                                          BrakeCmd, queue_size=1)
 
         # TODO: Create `TwistController` object
-        self.pid_controller = PID(1, 0, .1) # currently theses numbers are
+        self.pid_controller = PID(0, 0, 0, True) # currently theses numbers are
         # set arbitrarily
-        self.yaw_controller = YawController(wheel_base, steer_ratio, 0,
+        self.yaw_controller = YawController(wheel_base, steer_ratio, 0.2,
                                             max_lat_accel, max_steer_angle)
         self.controller = Controller(self.pid_controller, self.yaw_controller)
         rospy.loginfo("TwistController created")
@@ -95,14 +100,34 @@ class DBWNode(object):
             # You should only publish the control commands if dbw is enabled
             linear_velocity = angular_velocity = current_velocity = 0.0
             if self.current_velocity is not None and self.twist_cmd is not None:
-                linear_velocity = self.twist_cmd.twist.linear.x
-                angular_velocity = self.twist_cmd.twist.angular.z
-                current_velocity = self.current_velocity.twist.linear.x
+                lx = self.twist_cmd.twist.linear.x
+                ly = self.twist_cmd.twist.linear.y
+                lz = self.twist_cmd.twist.linear.z
+                ax = self.twist_cmd.twist.angular.x
+                ay = self.twist_cmd.twist.angular.y
+                az = self.twist_cmd.twist.angular.z
+                cx = self.current_velocity.twist.linear.x
+                cy = self.current_velocity.twist.linear.y
+                cz = self.current_velocity.twist.linear.z
+                cax = self.current_velocity.twist.angular.x
+                cay = self.current_velocity.twist.angular.y
+                caz = self.current_velocity.twist.angular.z
+                rospy.loginfo('target_linear_velocity: %s, %s, %s', lx, ly, lz)
+                rospy.loginfo('target_angular_velocity: %s, %s, %s', ax, ay, az)
+                rospy.loginfo('current_linear_velocity: %s, %s, %s', cx, cy, cz)
+                rospy.loginfo('current_angular_velocity: %s, %s, %s', cax, cay, caz)
+                linear_velocity = math.sqrt(lx ** 2 + ly ** 2 + lz ** 2)
+                angular_velocity = math.sqrt(ax ** 2 + ay ** 2 + az ** 2)
+                current_velocity = math.sqrt(cx ** 2 + cy ** 2 + cz ** 2)
             throttle, brake, steering = self.controller.control(linear_velocity,
                                                                 angular_velocity,
                                                                 current_velocity)
+            brake += self.brake_deadband
+            brake *= self.vehicle_mass * self.wheel_radius
+            steering = self.lowpass_filter.filt(steering)
+
             if self.dbw_enabled:
-                self.publish(throttle, brake, steering)
+                self.publish(0.5, 0, steering)
             else:
                 rospy.logwinfo('dbw is disabled, reset pid controller')
                 # reset pid controller
