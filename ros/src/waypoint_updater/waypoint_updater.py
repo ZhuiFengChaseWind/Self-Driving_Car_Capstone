@@ -45,7 +45,7 @@ class WaypointUpdater(object):
     def next_waypoint(self, position):
         waypoints_list = self.base_waypoints.waypoints
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
-        min_dist = 0
+        min_dist = 10000
         nearest_waypoint = -1
         for i in range(len(waypoints_list)):
             waypoint_position = waypoints_list[i].pose.pose.position
@@ -54,11 +54,11 @@ class WaypointUpdater(object):
                 min_dist = dist
                 nearest_waypoint = i
         nearest_waypoint_position = waypoints_list[nearest_waypoint].pose.pose.position
-        rospy.loginfo('nearest_waypoint: %s, %s, %s', nearest_waypoint_position.x,
+        rospy.loginfo('nearest_waypoint: %s, %s, %s, %s', nearest_waypoint, nearest_waypoint_position.x,
         nearest_waypoint_position.y, nearest_waypoint_position.z)
-        next_to_nearest = nearest_waypoint + 1
+        next_to_nearest = (nearest_waypoint + 1) % len(waypoints_list)
         next_nearest_wp = waypoints_list[next_to_nearest].pose.pose.position
-        rospy.loginfo('next_to_nearest_waypoint: %s, %s, %s', next_nearest_wp.x,
+        rospy.loginfo('next_to_nearest_waypoint: %s, %s, %s, %s', next_to_nearest, next_nearest_wp.x,
         next_nearest_wp.y, next_nearest_wp.z)
 
         next_x = waypoints_list[next_to_nearest].pose.pose.position.x

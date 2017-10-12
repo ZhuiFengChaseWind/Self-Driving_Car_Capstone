@@ -116,18 +116,21 @@ class DBWNode(object):
                 rospy.loginfo('target_angular_velocity: %s, %s, %s', ax, ay, az)
                 rospy.loginfo('current_linear_velocity: %s, %s, %s', cx, cy, cz)
                 rospy.loginfo('current_angular_velocity: %s, %s, %s', cax, cay, caz)
-                linear_velocity = math.sqrt(lx ** 2 + ly ** 2 + lz ** 2)
-                angular_velocity = math.sqrt(ax ** 2 + ay ** 2 + az ** 2)
-                current_velocity = math.sqrt(cx ** 2 + cy ** 2 + cz ** 2)
+                linear_velocity = lx
+                angular_velocity = az
+                current_velocity = cx
+            else:
+                rospy.logwarn('current velocity or twist_cmd is None')
             throttle, brake, steering = self.controller.control(linear_velocity,
                                                                 angular_velocity,
                                                                 current_velocity)
             brake += self.brake_deadband
             brake *= self.vehicle_mass * self.wheel_radius
-            steering = self.lowpass_filter.filt(steering)
+            # steering = self.lowpass_filter.filt(steering)
 
             if self.dbw_enabled:
-                self.publish(0.5, 0, steering)
+                self.publish(throttle, brake, float(steering))
+                rospy.loginfo('steering angle is: %s', steering)
             else:
                 rospy.logwinfo('dbw is disabled, reset pid controller')
                 # reset pid controller
