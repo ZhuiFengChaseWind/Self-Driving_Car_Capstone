@@ -45,7 +45,7 @@ class WaypointUpdater(object):
     def next_waypoint(self, position):
         waypoints_list = self.base_waypoints.waypoints
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
-        min_dist = 0
+        min_dist = 10000
         nearest_waypoint = -1
         for i in range(len(waypoints_list)):
             waypoint_position = waypoints_list[i].pose.pose.position
@@ -53,18 +53,33 @@ class WaypointUpdater(object):
             if dist < min_dist:
                 min_dist = dist
                 nearest_waypoint = i
-        prev_waypoint = nearest_waypoint - 1
-        dist_prev_current_position = dl(position, waypoints_list[prev_waypoint].pose.pose.position)
-        dist_prev_nearest = dl(waypoints_list[prev_waypoint].pose.pose.position,
-                               waypoints_list[nearest_waypoint].pose.pose.position)
-        if dist_prev_current_position < dist_prev_nearest:
-            return nearest_waypoint
-        return nearest_waypoint + 1
+        nearest_waypoint_position = waypoints_list[nearest_waypoint].pose.pose.position
+        rospy.loginfo('nearest_waypoint: %s, %s, %s, %s', nearest_waypoint, nearest_waypoint_position.x,
+        nearest_waypoint_position.y, nearest_waypoint_position.z)
+        next_to_nearest = (nearest_waypoint + 1) % len(waypoints_list)
+        next_nearest_wp = waypoints_list[next_to_nearest].pose.pose.position
+        rospy.loginfo('next_to_nearest_waypoint: %s, %s, %s, %s', next_to_nearest, next_nearest_wp.x,
+        next_nearest_wp.y, next_nearest_wp.z)
+
+        next_x = waypoints_list[next_to_nearest].pose.pose.position.x
+        nearest_x = waypoints_list[nearest_waypoint].pose.pose.position.x
+        next_y = waypoints_list[next_to_nearest].pose.pose.position.y
+        nearest_y = waypoints_list[nearest_waypoint].pose.pose.position.y
+        px = position.x
+        py = position.y
+        if (next_x - nearest_x) * (px - nearest_x) + (next_y - nearest_y) * (py -
+            nearest_y) > 0:
+            return next_to_nearest
+        return nearest_waypoint 
 
     def pose_cb(self, msg):
         # TODO: Implement
         position = msg.pose.position
+        rospy.loginfo("current_car_position: %s, %s, %s", position.x, position.y, position.z)
         next_wp = self.next_waypoint(position)
+        next_wp_p = self.base_waypoints.waypoints[next_wp].pose.pose.position
+        rospy.loginfo('next_waypoint: %s, %s, %s', next_wp_p.x, next_wp_p.y,
+        next_wp_p.z)
         base_waypoints_length = len(self.base_waypoints.waypoints)
         ahead_waypoints = []
         for i in range(LOOKAHEAD_WPS):

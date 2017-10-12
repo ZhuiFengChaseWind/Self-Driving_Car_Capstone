@@ -18,5 +18,8 @@ class Controller(object):
         brake = 0.
         if throttle < 0:
             brake = -throttle
+            throttle = 0
+        if throttle > 1:
+            throttle = 1
 
         return throttle, brake, steer
