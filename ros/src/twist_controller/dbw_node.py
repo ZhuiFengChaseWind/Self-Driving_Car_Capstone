@@ -69,15 +69,16 @@ class DBWNode(object):
         # TODO: Create `TwistController` object
         self.pid_controller = PID(3.31, 0.935718840848, 1.00036998849, False) # currently theses numbers are
         # set arbitrarily
-        self.yaw_controller = YawController(wheel_base, steer_ratio, 0.2,
+        self.yaw_controller = YawController(wheel_base, steer_ratio, 0.02,
                                             max_lat_accel, max_steer_angle)
-        self.controller = Controller(self.pid_controller, self.yaw_controller)
+
+        self.controller = Controller(self.pid_controller, self.yaw_controller, self.lowpass_filter)
         rospy.loginfo("TwistController created")
 
-        # TODO: Subscribe to all the topics you need to
-        self.dbw_status_sub = rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_status_cb)
-        self.current_velocity_sub = rospy.Subscriber('/current_velocity', TwistStamped, self.current_velocity_cb)
-        self.twist_cmd_sub = rospy.Subscriber('/twist_cmd', TwistStamped,
+        # Subscribe to all the topics you need to
+        rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_status_cb)
+        rospy.Subscriber('/current_velocity', TwistStamped, self.current_velocity_cb)
+        rospy.Subscriber('/twist_cmd', TwistStamped,
                                               self.twist_cmd_cb)
         self.loop()
 
@@ -119,8 +120,8 @@ class DBWNode(object):
                 linear_velocity = lx
                 angular_velocity = az
                 current_velocity = cx
-            else:
-                rospy.logwarn('current velocity or twist_cmd is None')
+            #else:
+                #rospy.logwarn('current velocity or twist_cmd is None')
             throttle, brake, steering = self.controller.control(linear_velocity,
                                                                 angular_velocity,
                                                                 current_velocity)
