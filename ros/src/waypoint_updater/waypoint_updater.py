@@ -103,6 +103,8 @@ class WaypointUpdater(object):
             idx_offset = 0
             look_for_next_waypoint = True
 
+        #TODO:if(next_x - nearest_x) * (px - nearest_x) + (next_y - nearest_y) * (py - nearest_y) > 0:return next_to_nearest
+        #TODO return nearest_waypoint
         for i in range(len_base_wp):
             idx = (i + idx_offset)%(len_base_wp)
             wp_x=self.base_waypoints[idx].pose.pose.position.x
