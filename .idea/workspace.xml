@@ -1,7 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f22e7c5a-d883-439b-86df-b4378a4ba629" name="Default" comment="" />
+    <list default="true" id="f22e7c5a-d883-439b-86df-b4378a4ba629" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/imgs/autoware_computing.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/imgs/autoware_tf1.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/imgs/autoware_tf2.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/imgs/open_simulator.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/imgs/select_waypoint.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/imgs/unity.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Dockerfile" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/churchlot_with_cars.csv" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/grasshopper_calibration.yml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/maptf.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/sim_waypoints.csv" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/wp_yaw.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/data/wp_yaw_const.csv" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/requirements.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/.catkin_workspace" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/launch/site.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/launch/styx.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/CMakeLists.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/camera_info_publisher/CMakeLists.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/camera_info_publisher/launch/camera_info_publisher.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/camera_info_publisher/package.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/camera_info_publisher/yaml_to_camera_info_publisher.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx/CMakeLists.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx/bridge.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx/conf.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx/launch/server.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx/package.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx/server.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx/unity_simulator_launcher.sh" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx_msgs/CMakeLists.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx_msgs/msg/Lane.msg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx_msgs/msg/TrafficLight.msg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx_msgs/msg/TrafficLightArray.msg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx_msgs/msg/Waypoint.msg" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/styx_msgs/package.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/tl_detector/CMakeLists.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/tl_detector/launch/tl_detector.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/tl_detector/launch/tl_detector_site.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/tl_detector/light_classification/__init__.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/tl_detector/light_classification/tl_classifier.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/tl_detector/light_publisher.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/tl_detector/package.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/tl_detector/sim_traffic_light_config.yaml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/tl_detector/site_traffic_light_config.yaml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/tl_detector/tl_detector.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/twist_controller/CMakeLists.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/twist_controller/dbw_node.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/twist_controller/dbw_test.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/twist_controller/launch/dbw.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/twist_controller/launch/dbw_sim.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/twist_controller/launch/dbw_test.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/twist_controller/lowpass.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/twist_controller/package.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/twist_controller/pid.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/twist_controller/twist_controller.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/twist_controller/yaw_controller.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_follower/CMakeLists.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_follower/include/libwaypoint_follower.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_follower/include/pure_pursuit_core.h" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_follower/launch/pure_pursuit.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_follower/lib/libwaypoint_follower.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_follower/package.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_follower/src/pure_pursuit.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_follower/src/pure_pursuit_core.cpp" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_loader/CMakeLists.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_loader/launch/waypoint_loader.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_loader/launch/waypoint_loader_site.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_loader/package.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_loader/waypoint_loader.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_updater/CMakeLists.txt" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_updater/launch/waypoint_updater.launch" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ros/src/waypoint_updater/package.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,8 +88,8 @@
       <file leaf-file-name="waypoint_updater.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ros/src/waypoint_updater/waypoint_updater.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
-              <caret line="106" column="37" lean-forward="false" selection-start-line="106" selection-start-column="37" selection-end-line="106" selection-end-column="37" />
+            <state relative-caret-position="245">
+              <caret line="109" column="62" lean-forward="false" selection-start-line="109" selection-start-column="62" selection-end-line="109" selection-end-column="62" />
               <folding />
             </state>
           </provider>
@@ -91,13 +165,6 @@
               <item name="Self-Driving_Car_Capstone" type="462c0819:PsiDirectoryNode" />
               <item name="ros" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Self-Driving_Car_Capstone" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Self-Driving_Car_Capstone" type="462c0819:PsiDirectoryNode" />
-              <item name="ros" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="waypoint_updater" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -291,14 +358,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="234">
           <caret line="106" column="51" lean-forward="true" selection-start-line="106" selection-start-column="51" selection-end-line="106" selection-end-column="51" />
-          <folding />
+          <folding>
+            <element signature="e#23#35#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ros/src/waypoint_updater/waypoint_updater.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="106" column="37" lean-forward="false" selection-start-line="106" selection-start-column="37" selection-end-line="106" selection-end-column="37" />
+        <state relative-caret-position="245">
+          <caret line="109" column="62" lean-forward="false" selection-start-line="109" selection-start-column="62" selection-end-line="109" selection-end-column="62" />
           <folding />
         </state>
       </provider>
