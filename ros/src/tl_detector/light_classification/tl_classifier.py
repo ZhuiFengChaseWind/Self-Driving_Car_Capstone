@@ -4,9 +4,9 @@ import cv2
 import numpy as py
 
 class TLClassifier(object):
-    def __init__(self, model_path):
+    def __init__(self):
         #TODO load classifier        
-        self.model = load_model(model_path)
+        self.model = load_model("light_classification/models/sim_tl_model.h5")
 
     def get_classification(self, image):
         """Determines the color of the traffic light in the image
