@@ -114,7 +114,7 @@ class TLDetector(object):
                 wp_index = i
         return wp_index
 
-    def get_light_state(self, light):
+    def get_light_state(self):
         """Determines the current color of the traffic light
         Args:
             light (TrafficLight): light to classify
@@ -147,15 +147,17 @@ class TLDetector(object):
             cloest_light_wp = None
             for i, light_position in enumerate(stop_line_positions):
                 car_position = self.waypoints.waypoints[car_position_index].pose.pose.position
-                dist = self.distance(car_position, light_position)
                 pose = Pose()
                 pose.position.x = light_position[0]
                 pose.position.y = light_position[1]
+                dist = self.distance(car_position, pose.position)
                 light_wp = self.get_closest_waypoint(pose)
                 if dist < min_dist:
                     min_dist = dist
                     cloest_light_wp = light_wp
-
+        # debug
+        print("cloest_light_wp: ", cloest_light_wp)
+        print("light_state: ", self.get_light_state())
             if cloest_light_wp != None:
                 return cloest_light_wp, self.get_light_state()
             else:
