@@ -155,9 +155,9 @@ class TLDetector(object):
                 if dist < min_dist:
                     min_dist = dist
                     cloest_light_wp = light_wp
-        # debug
-        print("cloest_light_wp: ", cloest_light_wp)
-        print("light_state: ", self.get_light_state())
+            # debug
+            print("cloest_light_wp: ", cloest_light_wp)
+            print("light_state: ", self.get_light_state())
             if cloest_light_wp != None:
                 return cloest_light_wp, self.get_light_state()
             else:
