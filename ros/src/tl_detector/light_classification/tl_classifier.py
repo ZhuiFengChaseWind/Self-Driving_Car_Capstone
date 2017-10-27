@@ -53,7 +53,8 @@ class TLClassifier(object):
         # green = 0
         # yellow = 2
         # ------------------------------------------------------
-
+        image_data = image
+        
         with tf.Session() as sess:
             softmax_tensor = sess.graph.get_tensor_by_name('final_result:0')
             predictions = sess.run(softmax_tensor, \
