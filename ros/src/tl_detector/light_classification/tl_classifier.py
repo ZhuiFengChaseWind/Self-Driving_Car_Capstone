@@ -2,6 +2,8 @@ from styx_msgs.msg import TrafficLight
 from keras.models import load_model
 from keras.models import model_from_yaml
 import numpy as np
+import io
+import scipy as scipy
 import cv2
 import numpy as py
 import tensorflow as tf
@@ -45,22 +47,22 @@ class TLClassifier(object):
         # uint8 RED=0
 
         # However, tha classifier's label are as below
-        # red = 1
-        # green = 0
         # yellow = 2
+        # red = 1        
+        # green = 0
         # ------------------------------------------------------
         #image_data = image
         
-        img = image		
-        img = cv2.resize(img,(150,150))		
-        img = np.reshape(img,[1,150,150,3])
+        img = scipy.misc.toimage(image, channel_axis=2)
+        jpeg_bytes = io.BytesIO()
+        img.save(jpeg_bytes,format="JPEG")
+        jpeg_encoded = jpeg_bytes.getvalue()
 
-        graph = self.load_graph(self.modelPath)
-                                  
+        graph = self.load_graph(self.modelPath)                              
         with tf.Session(graph=graph) as sess:
             softmax_tensor = sess.graph.get_tensor_by_name('prefix/final_result:0')
             predictions = sess.run(softmax_tensor, \
-                    {'prefix/DecodeJpeg/contents:0': img})
+                    {'prefix/DecodeJpeg/contents:0': jpeg_encoded})
 
             top_k = predictions[0].argsort()[-len(predictions[0]):][::-1]
             prediction = top_k[0]
