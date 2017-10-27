@@ -56,8 +56,8 @@ class TLClassifier(object):
 
 
             if prediction == TrafficLight.RED:               
-            print("Detected is RED")
-            prediction = TrafficLight.RED
+                print("Detected is RED")
+                prediction = TrafficLight.RED
             elif prediction == TrafficLight.YELLOW:
                 print("Detected is YELLOW")
                 prediction = TrafficLight.YELLOW
