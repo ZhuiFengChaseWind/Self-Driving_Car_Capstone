@@ -9,10 +9,21 @@ import tensorflow as tf
 class TLClassifier(object):
     def __init__(self):
         #TODO load classifier        
-        # with self.graph.as_default():
-        #     self.model = load_model("light_classification/models/sim_tl_model.h5")
-        self.sess = None        
         self.modelPath = "light_classification/models/retrain_inception/retrained_graph.pb"
+
+    def load_graph(self, frozen_graph_filename):
+        # We load the protobuf file from the disk and parse it to retrieve the 
+        # unserialized graph_def
+        with tf.gfile.GFile(frozen_graph_filename, "rb") as f:
+            graph_def = tf.GraphDef()
+            graph_def.ParseFromString(f.read())
+
+        # Then, we import the graph_def into a new Graph and returns it 
+        with tf.Graph().as_default() as graph:
+            # The name var will prefix every op/nodes in your graph
+            # Since we load everything in a new graph, this is not needed
+            tf.import_graph_def(graph_def, name="prefix")
+        return graph
 
     def get_classification(self, image):
         """Determines the color of the traffic light in the image
@@ -38,17 +49,18 @@ class TLClassifier(object):
         # green = 0
         # yellow = 2
         # ------------------------------------------------------
-        image_data = image
+        #image_data = image
+        
+        img = image		
+        img = cv2.resize(img,(150,150))		
+        img = np.reshape(img,[1,150,150,3])
 
-        if self.sess == None:
-            gd = tf.GraphDef()
-            gd.ParseFromString(tf.gfile.GFile(self.modelPath, "rb").read())
-            self.sess = tf.Session()
-                        
-        with self.sess as sess:
-            softmax_tensor = sess.graph.get_tensor_by_name('final_result:0')
+        graph = self.load_graph(self.modelPath)
+                                  
+        with tf.Session(graph=graph) as sess:
+            softmax_tensor = sess.graph.get_tensor_by_name('prefix/final_result:0')
             predictions = sess.run(softmax_tensor, \
-                    {'DecodeJpeg/contents:0': image_data})
+                    {'prefix/DecodeJpeg/contents:0': img})
 
             top_k = predictions[0].argsort()[-len(predictions[0]):][::-1]
             prediction = top_k[0]
