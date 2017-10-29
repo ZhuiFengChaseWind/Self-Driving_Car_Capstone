@@ -77,7 +77,7 @@ class TLClassifier(object):
                 prediction = TrafficLight.YELLOW
             elif prediction == TrafficLight.GREEN:
                 print("Detected is GREEN")
-                prediction = TrafficLight.YELLOW
+                prediction = TrafficLight.GREEN
             else:
                 print("Path is clear")
                 prediction == TrafficLight.UNKNOWN
