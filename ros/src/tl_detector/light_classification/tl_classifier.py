@@ -13,6 +13,7 @@ class TLClassifier(object):
         #TODO load classifier        
         modelPath = "light_classification/models/frozen_sim_mobile/frozen_sim_mobile.pb"
         labels_file "light_classification/models/frozen_sim_mobile/label_map.pbtxt"
+        num_classes = 14
 
         label_map = label_map_util.load_labelmap(labels_file)        
         categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=num_classes,
