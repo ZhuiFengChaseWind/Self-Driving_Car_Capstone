@@ -11,76 +11,99 @@ import tensorflow as tf
 class TLClassifier(object):
     def __init__(self):
         #TODO load classifier        
-        self.modelPath = "light_classification/models/retrain_inception/retrained_graph.pb"
+        modelPath = "light_classification/models/frozen_sim_mobile/frozen_sim_mobile.pb"
+        labels_file "light_classification/models/frozen_sim_mobile/label_map.pbtxt"
 
-    def load_graph(self, frozen_graph_filename):
-        # We load the protobuf file from the disk and parse it to retrieve the 
-        # unserialized graph_def
-        with tf.gfile.GFile(frozen_graph_filename, "rb") as f:
-            graph_def = tf.GraphDef()
-            graph_def.ParseFromString(f.read())
+        label_map = label_map_util.load_labelmap(labels_file)        
+        categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=num_classes,
+                                                                    use_display_name=True)
+        self.category_index = label_map_util.create_category_index(categories)
 
-        # Then, we import the graph_def into a new Graph and returns it 
-        with tf.Graph().as_default() as graph:
-            # The name var will prefix every op/nodes in your graph
-            # Since we load everything in a new graph, this is not needed
-            tf.import_graph_def(graph_def, name="prefix")
-        return graph
+        self.image_np_deep = None
+        self.detection_graph = tf.Graph()
+
+        config = tf.ConfigProto()
+        ##config.gpu_options.allow_growth = True
+
+        with self.detection_graph.as_default():
+            od_graph_def = tf.GraphDef()
+
+            with tf.gfile.GFile(modelPath, 'rb') as fid:
+                serialized_graph = fid.read()
+                od_graph_def.ParseFromString(serialized_graph)
+                tf.import_graph_def(od_graph_def, name='')
+
+            self.sess = tf.Session(graph=self.detection_graph, config=config)
+
+        # Definite input and output Tensors for detection_graph
+        self.image_tensor = self.detection_graph.get_tensor_by_name('image_tensor:0')
+
+        # Each box represents a part of the image where a particular object was detected.
+        self.detection_boxes = self.detection_graph.get_tensor_by_name('detection_boxes:0')
+
+        # Each score represent how level of confidence for each of the objects.
+        # Score is shown on the result image, together with the class label.
+        self.detection_scores = self.detection_graph.get_tensor_by_name('detection_scores:0')
+        self.detection_classes = self.detection_graph.get_tensor_by_name('detection_classes:0')
+        self.num_detections = self.detection_graph.get_tensor_by_name('num_detections:0')
+
+        print("Loaded frozen model graph")
 
     def get_classification(self, image):
         """Determines the color of the traffic light in the image
-
         Args:
             image (cv::Mat): image containing the traffic light
-
         Returns:
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
-
         """
-        #TODO implement light color prediction
-        # ------------------------------------------------------
-        # TrafficLight.msg enum are as below
+        self.current_light = TrafficLight.UNKNOWN
 
-        # uint8 UNKNOWN=4
-        # uint8 GREEN=2
-        # uint8 YELLOW=1
-        # uint8 RED=0
+        image_expanded = np.expand_dims(image, axis=0)
+        with self.detection_graph.as_default():
+            (boxes, scores, classes, num) = self.sess.run(
+                [self.detection_boxes, self.detection_scores,
+                 self.detection_classes, self.num_detections],
+                feed_dict={self.image_tensor: image_expanded})
 
-        # However, tha classifier's label are as below
-        # yellow = 2
-        # red = 1        
-        # green = 0
-        # ------------------------------------------------------
-        #image_data = image
-        
-        img = scipy.misc.toimage(image, channel_axis=2)
-        jpeg_bytes = io.BytesIO()
-        img.save(jpeg_bytes,format="JPEG")
-        jpeg_encoded = jpeg_bytes.getvalue()
+        boxes = np.squeeze(boxes)
+        scores = np.squeeze(scores)
+        classes = np.squeeze(classes).astype(np.int32)
 
-        graph = self.load_graph(self.modelPath)                              
-        with tf.Session(graph=graph) as sess:
-            softmax_tensor = sess.graph.get_tensor_by_name('prefix/final_result:0')
-            predictions = sess.run(softmax_tensor, \
-                    {'prefix/DecodeJpeg/contents:0': jpeg_encoded})
+        min_score_thresh = .50
+        for i in range(boxes.shape[0]):
+            if scores is None or scores[i] > min_score_thresh:
 
-            top_k = predictions[0].argsort()[-len(predictions[0]):][::-1]
-            prediction = top_k[0]
-            print("The prediction label is ", prediction)
+                class_name = self.category_index[classes[i]]['name']
+                # class_id = self.category_index[classes[i]]['id']  # if needed
 
+                if class_name == 'Red':
+                    self.current_light = TrafficLight.RED
+                elif class_name == 'Green':
+                    self.current_light = TrafficLight.GREEN
+                elif class_name == 'Yellow':
+                    self.current_light = TrafficLight.YELLOW
 
-            if prediction == TrafficLight.RED:               
-                print("Detected is RED")
-                prediction = TrafficLight.RED
-            elif prediction == TrafficLight.YELLOW:
-                print("Detected is YELLOW")
-                prediction = TrafficLight.YELLOW
-            elif prediction == TrafficLight.GREEN:
-                print("Detected is GREEN")
-                prediction = TrafficLight.GREEN
-            else:
-                print("Path is clear")
-                prediction == TrafficLight.UNKNOWN
+                # # Credits: Anthony Sarkis
+                # fx = 1345.200806
+                # fy = 1353.838257
+                # perceived_width_x = (boxes[i][3] - boxes[i][1]) * 800
+                # perceived_width_y = (boxes[i][2] - boxes[i][0]) * 600
+                #
+                # # ymin, xmin, ymax, xmax = box
+                # # depth_prime = (width_real * focal) / perceived_width
+                # # traffic light is 4 feet long and 1 foot wide?
+                # perceived_depth_x = ((1 * fx) / perceived_width_x)
+                # perceived_depth_y = ((3 * fy) / perceived_width_y)
+                #
+                # estimated_distance = round((perceived_depth_x + perceived_depth_y) / 2)
+                #
+                self.image_np_deep = image
 
-            return prediction
+        if (self.current_light == TrafficLight.UNKNOWN):
+            class_name = 'UNKNOWN'
+
+        # rospy.loginfo('TL_CLassifier:: {}'.format(class_name))
+        # rospy.loginfo('\n')
+
+        return self.current_light
 
