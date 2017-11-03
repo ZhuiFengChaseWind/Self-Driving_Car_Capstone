@@ -22,6 +22,7 @@ class TLDetector(object):
         self.waypoints = None
         self.camera_image = None
         self.lights = []
+        self.previous_light_state = None
 
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -156,8 +157,13 @@ class TLDetector(object):
                     min_dist = dist
                     cloest_light_wp = light_wp
             # debug
-            print("cloest_light_wp: ", cloest_light_wp)
-            print("light_state: ", self.get_light_state())
+            # print("cloest_light_wp: ", cloest_light_wp)
+            light_state = self.get_light_state()
+            if light_state != self.previous_light_state:
+
+                print("light_state: ", light_state)
+            self.previous_light_state = light_state
+
             if cloest_light_wp != None:
                 return cloest_light_wp, self.get_light_state()
             else:
