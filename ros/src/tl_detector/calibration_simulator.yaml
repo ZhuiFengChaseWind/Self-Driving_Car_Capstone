@@ -1,0 +1,20 @@
+image_width: 800
+image_height: 600
+camera_name: sim_monocular
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [2550.0, 0.0, 372.0, 0.0, 2300.0, 660.0, 0.0, 0.0, 1.0]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [0.0, 0.0, 0.0, 0.0, 0.0]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [2550.0, 0.0, 372.0, 0.0, 0.0, 2300.0, 660.0, 0.0, 0.0, 0.0, 1.0, 0.0]
