@@ -62,7 +62,7 @@ class WaypointUpdater(object):
         rospy.init_node('waypoint_updater')
 
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
-        self.base_wp_sub = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
+        rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
 
@@ -87,44 +87,44 @@ class WaypointUpdater(object):
             return False
 
         position = self.current_pose.position
-        pos_x = position.x
-        pos_y = position.y
-        orientation = self.current_pose.orientation
-        theta = math.atan2(orientation.y, orientation.x)
 
-        dist = 100000
-        wp = None
+
+        dist_limit = 10000
+        next_wp = None
+        nearest_wp = None
+        next_to_nearest = None
+        base_wp_list = self.base_waypoints.waypoints
         len_base_wp = len(self.base_waypoints.waypoints)
 
-        if self.next_waypoint:
-            idx_offset = self.next_waypoint
-            look_for_next_waypoint = False
-        else:
-            idx_offset = 0
-            look_for_next_waypoint = True
 
         #TODO:if(next_x - nearest_x) * (px - nearest_x) + (next_y - nearest_y) * (py - nearest_y) > 0:return next_to_nearest
         #TODO return nearest_waypoint
+        dist_cal = lambda a,b:math.sqrt((a.x - b.x)**2  + (a.y-b.y)**2 + (a.z - b.z) ** 2)
         for i in range(len_base_wp):
-            idx = (i + idx_offset)%(len_base_wp)
-            wp_x=self.base_waypoints[idx].pose.pose.position.x
-            wp_y=self.base_waypoints[idx].pose.pose.position.y
-            wp_d=self.sqrt((pos_x-wp_x)**2 + (pos_y-wp_y)**2)
+            waypoint_position = self.base_waypoints.waypoints[i].pose.pose.position
+            dist = dist_cal(position,waypoint_position)
+            if dist < dist_limit:
+                dist_limit = dist
+                nearest_wp = i
 
-            if wp_d < dist:
-                dist = wp_d
-                wp = idx
-            elif not look_for_next_waypoint:
-                if dist < max_waypoint_distance:
-                    rospy.logdebug('waypoint found')
-                    break
-                else:
-                    look_for_next_waypoint = True
+        next_to_nearest = (nearest_wp + 1) % len_base_wp
 
-        if wp is None:
+        if(next_to_nearest is not None and nearest_wp is not None):
+            next_x = base_wp_list[next_to_nearest].pose.pose.x
+            nearest_x = base_wp_list[nearest_wp].pose.pose.position.x
+            next_y = base_wp_list[next_to_nearest].pose.pose.y
+            nearest_y = base_wp_list[nearest_wp].pose.pose.y
+            px = position.x
+            py = position.y
+            if (next_x - nearest_x) * (px - nearest_x) + (next_y - nearest_y) * (py - nearest_y) > 0:
+                next_wp = next_to_nearest
+            else:
+                next_wp = nearest_wp
+
+        if next_wp is None:
             return False
 
-        self.next_waypoint = wp
+        self.next_waypoint = next_wp
         return True
 
 
