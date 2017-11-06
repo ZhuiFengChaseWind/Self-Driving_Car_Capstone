@@ -281,12 +281,17 @@ class TLDetector(object):
 
         # Don't process if the closest stop line is too far.
         if distance(p_car, self.stop_lines[j_stop]) > 70.0:
+            if self.previous_light_state != TrafficLight.UNKNOWN:
+                rospy.logwarn("light state is %s", TrafficLight.UNKNOWN)
+                self.previous_light_state = TrafficLight.UNKNOWN
             return (-1, TrafficLight.UNKNOWN)
 
         # Return the index and state of the traffic light.
         state = self.get_light_state(j_stop)
         # self.save_classifier_training_data(j_stop)
-        rospy.logwarn("light state is %s", state)
+        if state != self.previous_light_state:
+            rospy.logwarn("light state is %s", state)
+            self.previous_light_state = state
         return (i_stop, state)
 
 

@@ -120,7 +120,7 @@ class DBWNode(object):
                 angular_velocity = az
                 current_velocity = cx
             else:
-                rospy.logwarn('current velocity or twist_cmd is None')
+                pass
             throttle, brake, steering = self.controller.control(linear_velocity,
                                                                 angular_velocity,
                                                                 current_velocity)

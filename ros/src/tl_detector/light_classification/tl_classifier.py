@@ -24,7 +24,7 @@ class TLClassifier(object):
         data_path = root_lib + '/models/'
         
         print("Data path: {}".format(data_path))
-        self.model = load_model(data_path + 'whole_image_model_gpu.h5')
+        self.model = load_model(data_path + 'whole_image_model_34.h5')
         self.graph = tf.get_default_graph()
 
         self.model._make_predict_function()
