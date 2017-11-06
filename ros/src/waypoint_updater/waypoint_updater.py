@@ -43,6 +43,8 @@ class WaypointUpdater(object):
 
 
     def next_waypoint(self, position):
+        if self.base_waypoints is None:
+            return
         waypoints_list = self.base_waypoints.waypoints
         dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
         min_dist = 10000
@@ -74,6 +76,8 @@ class WaypointUpdater(object):
 
     def pose_cb(self, msg):
         # TODO: Implement
+        if self.base_waypoints is None:
+            return
         position = msg.pose.position
         rospy.loginfo("current_car_position: %s, %s, %s", position.x, position.y, position.z)
         next_wp = self.next_waypoint(position)
