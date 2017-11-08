@@ -16,9 +16,13 @@ from light_classification.tl_classifier import TLClassifier
 from styx_msgs.msg import TrafficLight, TrafficLightArray
 from styx_msgs.msg import Lane
 from sensor_msgs.msg import CameraInfo
+from random import randint
+from scipy.misc import imsave
+
 
 import os
 import time
+
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -52,19 +56,21 @@ def closest(P, p):
     return np.argmin(distance2(P, p))
 
 
-def save_training_data(image, region, label):
+def save_training_data(image, label):
     r'''giving the whole camera image, the portion containing the traffic 
     lights and the current light state, saving the image to files for later
     use
     '''
-    path_prefix="/tmp/tl_training/"
+    if label == 0 and randint(0, 9) < 7:
+        return
+
+    path_prefix="/home/michael/tl_test2/"
     path = path_prefix + str(label)
     current_millis = time.time()
     image_name = path + "/" + str(current_millis) + ".jpg"
-    region_name = path + "/" + str(current_millis) + "region.jpg"
+    image_name2 = path + "/" + str(current_millis) + "sci" + ".jpg"
     cv2.imwrite(image_name, image)
-    cv2.imwrite(region_name, region)
-
+    imsave(image_name2, image)
 
 
 
@@ -83,7 +89,7 @@ class TLDetector(object):
         self.traffic_lights_state = None
 
         self.waypoints = None
-        self.previous_light_state = None
+        self.previous_light_state = TrafficLight.UNKNOWN
 
         self.bridge = CvBridge()
         self.light_classifier = TLClassifier()
@@ -241,12 +247,14 @@ class TLDetector(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
         '''
         light = self.traffic_lights[light_index]
+        # state = self.traffic_lights_state[light_index]
         if self.camera_image is None:
             self.prev_light_loc = None
-            return False
+            return TrafficLight.UNKNOWN
 
         cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
         resized = cv2.resize(cv_image, (400, 300))
+        # save_training_data(resized, self.traffic_lights_state[light_index])
         state = self.light_classifier.get_classification(resized)
         return state
 

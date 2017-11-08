@@ -19,21 +19,24 @@ import numpy as np
 
 # load data
 file_names_dict = dict()
-for i in [0, 1, 2, 4]:
-    image_files = glob.glob("/tmp/tl_training/{}/*[!a-z].jpg".format(i))
-    image_files = image_files[0:min(550, len(image_files))]
+for i in [0, 1, 2]:
+    image_files = glob.glob("/home/michael/tl_training/{}/*.jpg".format(i))
     file_names_dict[i] = image_files
 
-   
-
+min_length = 9999999
 
 # In[48]:
 
 data_dict = dict()
 for key in file_names_dict:
+    length = len(file_names_dict.get(key))
+    if length < min_length:
+        min_length = length
+
+for key in file_names_dict:
     print(len(file_names_dict.get(key)))
-    fnames = file_names_dict.get(key)
-    images = [imresize(imread(x),(300, 400)) for x in fnames]
+    fnames = file_names_dict.get(key)[0:min_length]
+    images = [imread(x)  for x in fnames]
     data_dict[key] = images
     
     
