@@ -1,9 +1,13 @@
-# Self-Driving_Car_Capstone
-Final project for Udacity's Self-Driving Car nano degree program
-## Current State
--  waypoint updater is partially finished(publish waypoints in front of the car without regarding the traffic light or speed limit etc)
--  dbw node is partilly finished (use yaw_controller provided by udacity to get steering anges, use pid.py to get throttle value, the pid controller is initialized using 10, 0, 1 which arbitrarily choosen)
-## issues
--  sometimes the car is able to move, but sometimes not. and when the car is not able to move, after killing the launch process, the car will move for a little while which indicates that the program is somehow blocked.
-## Need Attention
-It said in the course that the dbw_enabled is always true in the simlulator, which is not the truth, need to uncheck the box before "Manual" to set the simulator to "dirve by wire" mode
+# waypoint_updater.py update
+# TODO: Make a full break without restart attempt while redlight is on
+##  1. Code restructure
+Since both pose_cb and traffic_cb update final_waypoints,the final_waypoints_pub should be extracted out from pose_cb
+
+
+## 2. Stop Strategy
+- If not meet the min distance, never make the v to 0
+- If meet the min distance and light is still red, make v to 0 and stop update wp
+- If red light detected but distance less than min distance(which means light turn red after car run through the cross), dont decelerate
+
+
+## 3. Break logic code redundency
