@@ -1,5 +1,6 @@
 # waypoint_updater.py update
 # TODO: Make a full break without restart attempt while redlight is on
+# TODO:Check twist_controller  for break control 
 ##  1. Code restructure
 Since both pose_cb and traffic_cb update final_waypoints,the final_waypoints_pub should be extracted out from pose_cb
 
