@@ -94,14 +94,14 @@ class WaypointUpdater(object):
             else:
                 # Slowly creep up to light if we have stopped short
                 dist = self.distance(wp.pose.pose.position, waypoints[end_wp].pose.pose.position)
-                if dist > STOP_BUFFER and self.current_velocity < 1.0:
-                    wp.twist.twist.linear.x = 2.0
+                if dist > STOP_BUFFER and self.current_velocity <= 1.0:
+                    wp.twist.twist.linear.x = 3.0
                 # Force stop
                 elif dist <= STOP_BUFFER:
                     wp.twist.twist.linear.x = 0.0
-                    continue
                 else:
-                    wp.twist.twist.linear.x = min(2.0, waypoints[index].twist.twist.linear.x)
+                    #wp.twist.twist.linear.x = min(2.0, waypoints[index].twist.twist.linear.x)
+                    wp.twist.twist.linear.x = self.current_velocity - i * 0.5
 
             final_waypoints.append(wp)
 

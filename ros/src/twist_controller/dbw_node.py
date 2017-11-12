@@ -67,7 +67,8 @@ class DBWNode(object):
                                          BrakeCmd, queue_size=1)
 
         # TODO: Create `TwistController` object
-        self.pid_controller = PID(1, 0, 0, True) # currently theses numbers are
+        # self.pid_controller = PID(1, 0, 0, True) # currently theses numbers are
+        self.pid_controller = PID(2, 0, 0, False) # currently theses numbers are
         # set arbitrarily
         self.yaw_controller = YawController(wheel_base, steer_ratio, 0.2,
                                             max_lat_accel, max_steer_angle)
