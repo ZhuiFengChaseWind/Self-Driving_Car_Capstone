@@ -90,37 +90,26 @@ class WaypointUpdater(object):
 
             if not self.braking:
                 #waypoints is the base_waypoints
-                wp.twist.twist.linear.x = waypoints[index].twist.twist.linear.x
+                # wp.twist.twist.linear.x = waypoints[index].twist.twist.linear.x
+                wp.twist.twist.linear.x = 15.0
             else:
                 # Slowly creep up to light if we have stopped short
                 dist = self.distance(wp.pose.pose.position, waypoints[end_wp].pose.pose.position)
-                if dist > STOP_BUFFER and self.current_velocity <= 1.0:
+                if dist > STOP_BUFFER and self.current_velocity < 3.0:
                     wp.twist.twist.linear.x = 3.0
                 # Force stop
                 elif dist <= STOP_BUFFER:
                     wp.twist.twist.linear.x = 0.0
                 else:
                     #wp.twist.twist.linear.x = min(2.0, waypoints[index].twist.twist.linear.x)
-                    wp.twist.twist.linear.x = self.current_velocity - i * 0.5
+                    if(self.current_velocity - i >3.0):
+                        wp.twist.twist.linear.x = self.current_velocity - i * 0.5
+                    else:
+                        wp.twist.twist.linear.x = 3.0
 
             final_waypoints.append(wp)
 
         return final_waypoints
-
-
-    def decelerate(self, waypoints, tl_wp):
-        rospy.logwarn("Start decelerate")
-        last = waypoints[tl_wp]
-        last.twist.twist.linear.x = 0.0
-        for wp in waypoints[:tl_wp][::-1]:
-            dist = self.distance(wp.pose.pose.position, last.pose.pose.position)
-            dist = max(0.0, dist - STOP_BUFFER)
-            vel  = math.sqrt(2 * self.decel * dist)
-            if vel < 1.0:
-                vel = 0.0
-            wp.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
-        return waypoints
-
 
     def distance(self, p1, p2):
         x = p1.x - p2.x
