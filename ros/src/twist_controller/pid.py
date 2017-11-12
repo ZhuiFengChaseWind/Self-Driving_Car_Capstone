@@ -10,7 +10,7 @@ class PID(object):
         # self.kd = kd
         self.k = [kp, ki, kd]
         if tune:
-            self.k = [1, 1, 1]
+            self.k = [1, 0, 0]
         self.min = mn
         self.max = mx
         
@@ -38,6 +38,7 @@ class PID(object):
                 self.error_sum += abs(error)
                 self.counter += 1
                 if self.counter > self.num_error or self.error_sum > self.min_error_sum:
+                    self.num_error *= 1.05
                     if self.error_sum < self.min_error_sum:
                         self.min_error_sum = self.error_sum
                         self.delta_k[self.selector] *= 1.1
