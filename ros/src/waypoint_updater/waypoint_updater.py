@@ -11,7 +11,7 @@ import copy
 
 LOOKAHEAD_WPS = 100
 MAX_DECEL     = 4.0
-STOP_BUFFER   = 2.0
+STOP_BUFFER   = 2.5
 
 
 class WaypointUpdater(object):
@@ -67,6 +67,7 @@ class WaypointUpdater(object):
                 lane.waypoints = self.get_final_waypoints(wpts, next_wp, next_wp+LOOKAHEAD_WPS)
                 self.acclerate = False
 
+                self.final_waypoints_pub.publish(lane)
             # Froce stop attempt
             # elif tl_dist > STOP_BUFFER and self.current_velocity < 5:
             #     self.braking = True
@@ -77,12 +78,15 @@ class WaypointUpdater(object):
             elif not self.braking and tl_dist < min_stopping_dist:
                 lane.waypoints = self.get_final_waypoints(wpts, next_wp, next_wp+LOOKAHEAD_WPS)
 
+                self.final_waypoints_pub.publish(lane)
             #3 Make a stop process
             else:
+
                 self.braking = True
                 lane.waypoints = self.get_final_waypoints(wpts, next_wp, traffic_wp)
+                self.final_waypoints_pub.publish(lane)
 
-            self.final_waypoints_pub.publish(lane)
+
 
 
     def get_final_waypoints(self, waypoints, start_wp, end_wp):
