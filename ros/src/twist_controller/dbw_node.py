@@ -91,6 +91,9 @@ class DBWNode(object):
     def dbw_status_cb(self, enabled):
         rospy.logwarn('dbw status updated to %s', enabled)
         self.dbw_enabled = enabled
+        self.pid_controller.reset()
+        self.throttle = 0.0
+        self.brake = 0.0
 
     def current_velocity_cb(self, velocity):
         self.current_velocity = velocity
@@ -136,14 +139,12 @@ class DBWNode(object):
             if self.dbw_enabled:
                 self.publish(throttle, brake, float(steering))
                 rospy.loginfo('steering angle is: %s', steering)
-            else:
-                rospy.logwinfo('dbw is disabled, reset pid controller')
                 # reset pid controller
-                self.pid_controller.reset()
             rate.sleep()
 
     def publish(self, throttle, brake, steer):
         if throttle > 0:
+            self.brake = brake
             if abs(throttle - self.throttle) / (self.throttle + 0.00001) > 0.1:
                 tcmd = ThrottleCmd()
                 tcmd.enable = True
@@ -152,6 +153,7 @@ class DBWNode(object):
                 self.throttle_pub.publish(tcmd)
                 self.throttle = throttle
         else:
+            self.throttle = throttle
             if abs(brake - self.brake) / (self.brake + 0.000001) > 0.1:
                 bcmd = BrakeCmd()
                 bcmd.enable = True
