@@ -14,7 +14,7 @@ class Controller(object):
         steer = self.yaw_controller.get_steering(linear_velocity, angular_velocity,
                                                  current_velocity)
         error = linear_velocity - current_velocity
-        throttle = self.pid_controller.step(error, 0.02)
+        throttle = self.pid_controller.step(error, 0.002)
         brake = 0.
         if throttle < 0:
             brake = -throttle
