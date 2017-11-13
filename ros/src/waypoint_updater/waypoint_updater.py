@@ -7,10 +7,11 @@ from   geometry_msgs.msg import PoseStamped, TwistStamped
 from   styx_msgs.msg     import Lane, Waypoint
 from   std_msgs.msg      import Int32
 
+import copy
 
-LOOKAHEAD_WPS = 200
+LOOKAHEAD_WPS = 100
 MAX_DECEL     = 4.0
-STOP_BUFFER   = 5.0
+STOP_BUFFER   = 2.0
 
 
 class WaypointUpdater(object):
@@ -26,12 +27,14 @@ class WaypointUpdater(object):
 
         self.current_velocity = 0.0
         self.decel = 1.0
+        self.accel = 5.0
         self.traffic_waypoint = -1
         self.braking = False
+        self.acclerate = True
 
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
-        rate = rospy.Rate(10)
+        rate = rospy.Rate(30)
         while not rospy.is_shutdown():
             self.loop()
             rate.sleep()
@@ -57,8 +60,12 @@ class WaypointUpdater(object):
 
             # 1 If at any time, the red light disappeared, run the car normally
             if traffic_wp == -1:
+                if self.braking: # means we need to start and accelerate the car
+                    self.acclerate = True
+                
                 self.braking = False
                 lane.waypoints = self.get_final_waypoints(wpts, next_wp, next_wp+LOOKAHEAD_WPS)
+                self.acclerate = False
 
             # Froce stop attempt
             # elif tl_dist > STOP_BUFFER and self.current_velocity < 5:
@@ -80,44 +87,30 @@ class WaypointUpdater(object):
 
     def get_final_waypoints(self, waypoints, start_wp, end_wp):
         final_waypoints = []
-        for i in range(start_wp, end_wp):
-            index = i % len(waypoints)
+        if end_wp < start_wp: # deal with the corner case that next traffic way point crossed the end of the track
+            end_wp += len(waypoints) 
+        
+        for i in range(start_wp, end_wp + 1):
             wp = Waypoint()
-            wp.pose.pose.position.x  = waypoints[index].pose.pose.position.x
-            wp.pose.pose.position.y  = waypoints[index].pose.pose.position.y
-            wp.pose.pose.position.z  = waypoints[index].pose.pose.position.z
-            wp.pose.pose.orientation = waypoints[index].pose.pose.orientation
-
-            if not self.braking:
-                #waypoints is the base_waypoints
-                wp.twist.twist.linear.x = waypoints[index].twist.twist.linear.x
-            else:
-                # Slowly creep up to light if we have stopped short
-                dist = self.distance(wp.pose.pose.position, waypoints[end_wp].pose.pose.position)
-                if dist > STOP_BUFFER and self.current_velocity <= 1.0:
-                    wp.twist.twist.linear.x = 3.0
-                # Force stop
-                elif dist <= STOP_BUFFER:
-                    wp.twist.twist.linear.x = 0.0
-                else:
-                    #wp.twist.twist.linear.x = min(2.0, waypoints[index].twist.twist.linear.x)
-                    wp.twist.twist.linear.x = self.current_velocity - i * 0.5
-
+            index = i % len(waypoints)
+            wp.pose = copy.deepcopy(waypoints[index].pose)
+            wp.twist = copy.deepcopy(waypoints[index].twist)
             final_waypoints.append(wp)
+        
 
+        if self.braking:
+            final_waypoints = self.decelerate(final_waypoints)
         return final_waypoints
 
 
-    def decelerate(self, waypoints, tl_wp):
-        rospy.logwarn("Start decelerate")
-        last = waypoints[tl_wp]
+    def decelerate(self, waypoints):
+        # rospy.logwarn("Start decelerate")
+        last = waypoints[len(waypoints) - 1]
         last.twist.twist.linear.x = 0.0
-        for wp in waypoints[:tl_wp][::-1]:
+        for wp in waypoints:
             dist = self.distance(wp.pose.pose.position, last.pose.pose.position)
             dist = max(0.0, dist - STOP_BUFFER)
             vel  = math.sqrt(2 * self.decel * dist)
-            if vel < 1.0:
-                vel = 0.0
             wp.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
         return waypoints
 
@@ -161,7 +154,22 @@ class WaypointUpdater(object):
         return closest_wp
 
 
+
     def get_next_waypoint(self, pose, waypoints):
+        closest_wp = self.get_closest_waypoint(pose, waypoints)
+        closest_wp_next = (closest_wp + 1) % len(waypoints)
+        wp0_x = waypoints[closest_wp].pose.pose.position.x
+        wp0_y = waypoints[closest_wp].pose.pose.position.y
+        wp1_x = waypoints[closest_wp_next].pose.pose.position.x
+        wp1_y = waypoints[closest_wp_next].pose.pose.position.y
+        x = pose.pose.position.x
+        y = pose.pose.position.y
+        if (y - wp0_y) * (wp1_y - wp0_y) + (x - wp0_x) * (wp1_x - wp0_x) >= 0:
+            return closest_wp_next
+        return closest_wp
+
+
+    def get_next_waypoint_old(self, pose, waypoints):
         closest_wp = self.get_closest_waypoint(pose, waypoints)
         wp_x = waypoints[closest_wp].pose.pose.position.x
         wp_y = waypoints[closest_wp].pose.pose.position.y

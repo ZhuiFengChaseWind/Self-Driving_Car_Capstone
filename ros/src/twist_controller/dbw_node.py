@@ -68,7 +68,7 @@ class DBWNode(object):
 
         # TODO: Create `TwistController` object
         # self.pid_controller = PID(1, 0, 0, True) # currently theses numbers are
-        self.pid_controller = PID(2, 0, 0, False) # currently theses numbers are
+        self.pid_controller = PID(3, 0, 0, False) # currently theses numbers are
         # set arbitrarily
         self.yaw_controller = YawController(wheel_base, steer_ratio, 0.2,
                                             max_lat_accel, max_steer_angle)
@@ -95,7 +95,7 @@ class DBWNode(object):
 
 
     def loop(self):
-        rate = rospy.Rate(50) # 50Hz
+        rate = rospy.Rate(500) # 50Hz
         while not rospy.is_shutdown():
             # TODO: Get predicted throttle, brake, and steering using `twist_controller`
             # You should only publish the control commands if dbw is enabled
@@ -127,7 +127,8 @@ class DBWNode(object):
                                                                 current_velocity)
             brake += self.brake_deadband
             brake *= self.vehicle_mass * self.wheel_radius
-            # steering = self.lowpass_filter.filt(steering)
+            #steering = self.lowpass_filter.filt(steering)
+            #throttle = self.lowpass_filter.filt(throttle)
 
             if self.dbw_enabled:
                 self.publish(throttle, brake, float(steering))
