@@ -99,6 +99,7 @@ class WaypointUpdater(object):
             index = i % len(waypoints)
             wp.pose = copy.deepcopy(waypoints[index].pose)
             wp.twist = copy.deepcopy(waypoints[index].twist)
+
             final_waypoints.append(wp)
         
 
@@ -117,7 +118,6 @@ class WaypointUpdater(object):
             vel  = math.sqrt(2 * self.decel * dist)
             wp.twist.twist.linear.x = min(vel, wp.twist.twist.linear.x)
         return waypoints
-
 
     def distance(self, p1, p2):
         x = p1.x - p2.x
