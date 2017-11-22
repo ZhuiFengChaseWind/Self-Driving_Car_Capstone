@@ -2,7 +2,7 @@
 ## Team Members:
 - Hang Wang (Team Lead) : hwang12wou@gmail.com
 - Yanqing Jing : 1410854263@qq.com
-- Xiao Wang : wangxiaoku@gmail.com
+- Xiao Wang : wangxiaonku@gmail.com
 - Calvin Low : calsaviour@gmail.com
 - Yuzhu Li : rainbamboo554155@hotmail.com
 
