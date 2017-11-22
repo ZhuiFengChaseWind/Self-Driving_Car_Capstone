@@ -69,3 +69,6 @@ Since both pose_cb and traffic_cb update final_waypoints,the final_waypoints_pub
 
 ## 3. Break logic code redundency
 - Solved
+
+## 4. Speed control
+- Speed in real test either too fast or too slow
