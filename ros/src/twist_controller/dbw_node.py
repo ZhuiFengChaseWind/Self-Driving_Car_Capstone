@@ -74,7 +74,8 @@ class DBWNode(object):
 
         # TODO: Create `TwistController` object
         # self.pid_controller = PID(1, 0, 0, True) # currently theses numbers are
-        self.pid_controller = PID(3, 0, 0, False) # currently theses numbers are
+        # kp: 2.33588304816, ki: 0.0, kd: 0.00118264912376
+        self.pid_controller = PID(2.33588304816, 0.0, 0.00118264912376, False) # currently theses numbers are
         # set arbitrarily
         self.yaw_controller = YawController(wheel_base, steer_ratio, 0.2,
                                             max_lat_accel, max_steer_angle)

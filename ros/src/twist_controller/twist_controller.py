@@ -20,7 +20,7 @@ class Controller(object):
             sample_time = current_timestamp - self.last_timestamp
         self.last_timestamp = current_timestamp
         error = linear_velocity - current_velocity
-        throttle = self.pid_controller.step(error, sample_time)
+        throttle = self.pid_controller.step(linear_velocity, current_velocity, sample_time)
         brake = 0.
         if throttle < 0:
             brake = -throttle

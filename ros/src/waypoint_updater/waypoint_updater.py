@@ -27,10 +27,10 @@ class WaypointUpdater(object):
 
         self.current_velocity = 0.0
         self.decel = 1.0
-        self.accel = 5.0
+        self.accel = 1.0
         self.traffic_waypoint = -1
         self.braking = False
-        self.acclerate = True
+        self.last_starting_point = None
 
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
@@ -60,13 +60,9 @@ class WaypointUpdater(object):
 
             # 1 If at any time, the red light disappeared, run the car normally
             if traffic_wp == -1:
-                if self.braking: # means we need to start and accelerate the car
-                    self.acclerate = True
                 
                 self.braking = False
                 lane.waypoints = self.get_final_waypoints(wpts, next_wp, next_wp+LOOKAHEAD_WPS)
-                self.acclerate = False
-
                 self.final_waypoints_pub.publish(lane)
             # Froce stop attempt
             # elif tl_dist > STOP_BUFFER and self.current_velocity < 5:
@@ -105,7 +101,25 @@ class WaypointUpdater(object):
 
         if self.braking:
             final_waypoints = self.decelerate(final_waypoints)
+        else:
+            final_waypoints = self.accelerate(final_waypoints)
         return final_waypoints
+
+    
+    def accelerate(self, waypoints):
+        # rospy.logwarn("Start accelerate")
+        if self.current_velocity <= 0.0001:
+            self.last_starting_point = self.current_pose.pose.position
+        if self.last_starting_point is None:
+            return waypoints
+        for wp in waypoints:
+            dist = self.distance(self.last_starting_point, wp.pose.pose.position)
+            vel = math.sqrt(2 * self.accel * dist)
+            if wp.twist.twist.linear.x > vel:
+                wp.twist.twist.linear.x = vel
+            else:
+                break
+        return waypoints
 
 
     def decelerate(self, waypoints):
