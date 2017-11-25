@@ -2,7 +2,7 @@
 ## Team Members:
 - Hang Wang (Team Lead) : hwang12wou@gmail.com
 - Yanqing Jing : 1410854263@qq.com
-- Xiao Wang : wangxiaoku@gmail.com
+- Xiao Wang : wangxiaonku@gmail.com
 - Calvin Low : calsaviour@gmail.com
 - Yuzhu Li : rainbamboo554155@hotmail.com
 
@@ -69,3 +69,6 @@ Since both pose_cb and traffic_cb update final_waypoints,the final_waypoints_pub
 
 ## 3. Break logic code redundency
 - Solved
+
+## 4. Speed control
+- Speed in real test either too fast or too slow
