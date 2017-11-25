@@ -7,6 +7,7 @@ import math
 from geometry_msgs.msg import Quaternion
 
 from styx_msgs.msg import Lane, Waypoint
+from std_msgs.msg       import Float64
 
 import tf
 import rospy
@@ -21,8 +22,14 @@ class WaypointLoader(object):
         rospy.init_node('waypoint_loader', log_level=rospy.DEBUG)
 
         self.pub = rospy.Publisher('/base_waypoints', Lane, queue_size=1, latch=True)
+        
 
         self.velocity = self.kmph2mps(rospy.get_param('~velocity'))
+        self.speed_limit_pub = rospy.Publisher('/speed_limit', Float64, queue_size=1, latch=True)
+        
+        # publish speed limit
+        self.speed_limit_pub.publish(self.velocity)
+
         self.new_waypoint_loader(rospy.get_param('~path'))
         rospy.spin()
 

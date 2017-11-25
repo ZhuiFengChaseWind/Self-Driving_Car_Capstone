@@ -4,6 +4,7 @@ import rospy
 from std_msgs.msg import Bool
 from dbw_mkz_msgs.msg import ThrottleCmd, SteeringCmd, BrakeCmd, SteeringReport
 from geometry_msgs.msg import TwistStamped
+from std_msgs.msg import Float64
 import math
 
 from twist_controller import Controller
@@ -73,9 +74,7 @@ class DBWNode(object):
                                          BrakeCmd, queue_size=1)
 
         # TODO: Create `TwistController` object
-        # self.pid_controller = PID(1, 0, 0, True) # currently theses numbers are
-        self.pid_controller = PID(3, 0, 0, False) # currently theses numbers are
-        # set arbitrarily
+        self.pid_controller = PID(2.33588304816, 0.0, 0.00118264912376, True) 
         self.yaw_controller = YawController(wheel_base, steer_ratio, 0.2,
                                             max_lat_accel, max_steer_angle)
         self.controller = Controller(self.pid_controller, self.yaw_controller)
@@ -84,9 +83,15 @@ class DBWNode(object):
         # TODO: Subscribe to all the topics you need to
         self.dbw_status_sub = rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_status_cb)
         self.current_velocity_sub = rospy.Subscriber('/current_velocity', TwistStamped, self.current_velocity_cb)
+
+        self.speed_limit_sub = rospy.Subscriber('/speed_limit', Float64, self.speed_limit_cb)
         self.twist_cmd_sub = rospy.Subscriber('/twist_cmd', TwistStamped,
                                               self.twist_cmd_cb)
         self.loop()
+
+    def speed_limit_cb(self, limit):
+        rospy.logwarn('speed limit changed to %s', limit)
+        self.pid_controller.set_speed_limit(limit.data)
 
     def dbw_status_cb(self, enabled):
         rospy.logwarn('dbw status updated to %s', enabled)

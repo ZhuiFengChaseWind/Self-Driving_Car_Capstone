@@ -8,7 +8,12 @@ class Controller(object):
         self.pid_controller = pid_controller
         self.yaw_controller = yaw_controller
         self.last_timestamp = None
+        self.speed_limit = None
         # TODO: Implement
+
+    def set_speed_limit(self, limit):
+        self.speed_limit = limit
+
     def control(self, linear_velocity, angular_velocity, current_velocity):
         # TODO: Change the arg, kwarg list to suit your needs
         # Return throttle, brake, steer
@@ -19,8 +24,8 @@ class Controller(object):
         if self.last_timestamp is not None:
             sample_time = current_timestamp - self.last_timestamp
         self.last_timestamp = current_timestamp
-        error = linear_velocity - current_velocity
-        throttle = self.pid_controller.step(error, sample_time)
+        
+        throttle = self.pid_controller.step(linear_velocity, current_velocity, sample_time)
         brake = 0.
         if throttle < 0:
             brake = -throttle
