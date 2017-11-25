@@ -9,8 +9,8 @@ class PID(object):
         # self.ki = ki
         # self.kd = kd
         self.k = [kp, ki, kd]
-        if tune:
-            self.k = [2.22404620955, 0.0, -0.0182480036314]
+        #if tune:
+        #    self.k = [2.22404620955, 0.0, -0.0182480036314]
         self.min = mn
         self.max = mx
         
@@ -26,19 +26,29 @@ class PID(object):
         self.selector = 0
         self.operation = ['o', 'o', 'o']
         self.counter = 0
+        self.speed_limit = 0.
 
+    
+    def set_speed_limit(self, limit):
+        self.speed_limit = limit
 
     def reset(self):
         self.int_val = 0.0
         self.last_int_val = 0.0
 
     def step(self, linear_velocity, current_velocity, sample_time):
-        error = linear_velocity * 0.97 - current_velocity
         
+        error = linear_velocity * 0.97 - current_velocity
         if self.tune:
-            if self.delta_k[0] + self.delta_k[1] + self.delta_k[2] > 0.0001:
+            #error = linear_velocity - current_velocity
+            over_limit = max(0, current_velocity - self.speed_limit)
+            if self.delta_k[0] + self.delta_k[1] + self.delta_k[2] > 0.0001 or\
+                over_limit > 0:
 
                 self.error_sum += abs(error)
+                if over_limit > 0:
+                    self.error_sum += (1 + over_limit) * 1000000
+
                 self.counter += 1
                 if self.counter > self.num_error or self.error_sum > self.min_error_sum:
                     if self.error_sum < self.min_error_sum:
